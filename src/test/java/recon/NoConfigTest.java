@@ -30,7 +30,7 @@ public class NoConfigTest {
         final String rhsFilename = copyToTempFile(lhsFilename);
         captureTheMessagesToTheConsole();
 
-        recon.app.Recon.main(new String[] {lhsFilename, rhsFilename});
+        recon.App.main(new String[] {lhsFilename, rhsFilename});
 
         new Verifications() {{
             System.out.println("files are identical");
