@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 
 import static com.google.common.base.Throwables.propagate;
-import static org.junit.Assert.fail;
+import static extensions.commons.lang3.SystemUtils.currentDirectory;
+import static extensions.hamcrest.FilePresenceMatcher.existsIn;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static recon.utils.InputUtils.dataRow;
 import static recon.utils.InputUtils.schema;
 
@@ -30,7 +32,7 @@ public class NoConfigTest {
         final String rhsFilename = copyToTempFile(lhsFilename);
         captureTheMessagesToTheConsole();
 
-        recon.App.main(new String[] {lhsFilename, rhsFilename});
+        recon.App.main(new String[]{lhsFilename, rhsFilename});
 
         new Verifications() {{
             System.out.println("files are identical");
@@ -39,7 +41,13 @@ public class NoConfigTest {
 
     @Test
     public void _2_writesOutputFileToCurrentDirIfFilesAreNotIdentical() {
-        fail("not implemented");
+        final InputUtils.Schema schema = schema("Column1");
+        final String lhsFilename = toTempFile(schema, dataRow("Hello"));
+        final String rhsFilename = toTempFile(schema, dataRow("World"));
+
+        recon.App.main(new String[] {lhsFilename, rhsFilename});
+
+        assertThat("output.xlsx", existsIn(currentDirectory()));
     }
 
     @Before
