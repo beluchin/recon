@@ -1,11 +1,11 @@
-package recon.api;
+package recon.files.impl;
 
 import com.google.inject.AbstractModule;
+import recon.files.ComparesFiles;
 
 public class Module extends AbstractModule {
     @Override
     protected void configure() {
-        // TODO: not implemented
-        throw new UnsupportedOperationException();
+        bind(ComparesFiles.class).to(ComparesFilesAsInputs.class);
     }
 }

@@ -1,8 +1,8 @@
 package recon;
 
-import recon.api.ComparesFiles;
-
-import static com.google.inject.Guice.createInjector;
+import com.google.inject.Guice;
+import recon.files.ComparesFiles;
+import recon.files.impl.Module;
 
 public final class App {
 
@@ -11,13 +11,14 @@ public final class App {
         final String rhsFilename = args[0];
 
         final ComparesFiles fileComparer = getComparer();
-        fileComparer.recon(lhsFilename, rhsFilename);
+        fileComparer.apply(lhsFilename, rhsFilename);
     }
 
     private static ComparesFiles getComparer() {
-        return createInjector(
-                new recon.api.Module(),
-                new recon.businesslogic.Module())
+        return Guice.createInjector(
+                new Module(),
+                new recon.impl.Module(),
+                new recon.datamodel.impl.Module())
                 .getInstance(ComparesFiles.class);
     }
 

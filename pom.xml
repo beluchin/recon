@@ -7,7 +7,7 @@
     <artifactId>recon</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>recon</name>
+    <name>bdd</name>
 
     <build>
         <plugins>
@@ -60,6 +60,19 @@
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <version>3.0</version>
+
+            <!--
+            Use this classifier to deal with the following Guice error:
+            com.google.inject.internal.util.$ComputationException: java.lang.ArrayIndexOutOfBoundsException
+
+            See: https://github.com/google/guice/issues/757
+            -->
+            <!--<classifier>no_aop</classifier>-->
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>2.0.1</version>
         </dependency>
     </dependencies>
 </project>
