@@ -1,8 +1,11 @@
 package recon;
 
-import recon.datamodel.ExcelWorkbook;
+import recon.datamodel.Output;
 import recon.datamodel.Input;
 
+import javax.annotation.Nullable;
+
 public interface ComparesInputs {
-    ExcelWorkbook recon(Input lhs, Input rhs);
+    @Nullable
+    Output recon(Input lhs, Input rhs);
 }

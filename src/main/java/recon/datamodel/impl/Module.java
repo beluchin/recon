@@ -2,7 +2,7 @@ package recon.datamodel.impl;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import recon.datamodel.ExcelWorkbook;
+import recon.datamodel.Output;
 
 public class Module extends AbstractModule {
     @Override
@@ -10,7 +10,7 @@ public class Module extends AbstractModule {
     }
 
     @Provides
-    ExcelWorkbook excelWorkbook() {
-        return new ExcelWorkbook() {};
+    Output output() {
+        return new Output() {};
     }
 }

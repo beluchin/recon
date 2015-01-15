@@ -4,6 +4,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+
+import static com.google.common.base.Throwables.propagate;
 
 public abstract class AbstractBddTest {
     private Injector injector;
@@ -21,8 +25,22 @@ public abstract class AbstractBddTest {
     }
 
     private Iterable<Module> getModules() {
-        return ImmutableList.<Module> of(
+        return ImmutableList.<Module>of(
                 new recon.impl.Module(),
                 new recon.datamodel.impl.Module());
+    }
+
+    private static BddTarget getBddTarget() {
+        final PropertiesConfiguration p =
+                getPropertiesConfiguration("bdd.properties");
+        return BddTarget.valueOf((String) p.getProperty("bddTarget"));
+    }
+
+    private static PropertiesConfiguration getPropertiesConfiguration(final String fileName) {
+        try {
+            return new PropertiesConfiguration(fileName);
+        } catch (ConfigurationException e) {
+            throw propagate(e);
+        }
     }
 }

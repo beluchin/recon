@@ -9,6 +9,10 @@ import java.util.stream.Stream;
 
 public class InputUtils {
 
+    public static DataRow[] data(final Stream<String> csvDataRows) {
+        return csvDataRows.map(InputUtils::dataRow).toArray(s -> new DataRow[s]);
+    }
+
     public static DataRow dataRow(final String csv) {
         return new DataRow() {
             private final String[] tokens = csv.split(",");
@@ -38,5 +42,4 @@ public class InputUtils {
             }
         };
     }
-
 }

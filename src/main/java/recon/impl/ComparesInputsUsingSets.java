@@ -3,7 +3,7 @@ package recon.impl;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSet;
 import recon.ComparesInputs;
-import recon.datamodel.ExcelWorkbook;
+import recon.datamodel.Output;
 import recon.datamodel.Input;
 
 import javax.annotation.Nullable;
@@ -37,19 +37,20 @@ class ComparesInputsUsingSets implements ComparesInputs {
         }
     }
 
-    private final Provider<ExcelWorkbook> workbookProvider;
+    private final Provider<Output> outputProvider;
 
     @Inject
-    ComparesInputsUsingSets(final Provider<ExcelWorkbook> workbookProvider) {
-        this.workbookProvider = workbookProvider;
+    ComparesInputsUsingSets(final Provider<Output> outputProvider) {
+        this.outputProvider = outputProvider;
     }
 
-    public @Nullable ExcelWorkbook recon(final Input rhs, final Input lhs) {
+    public @Nullable
+    Output recon(final Input rhs, final Input lhs) {
         Set<Integer> keyDefinition = getKeyDefinition(lhs, rhs);
         Set<Key> lhsKeys = getKeys(lhs, keyDefinition);
         Set<Key> rhsKeys = getKeys(rhs, keyDefinition);
         if (existsPopulationBreaks(lhsKeys, rhsKeys)) {
-            return workbookProvider.get();
+            return outputProvider.get();
         }
         return null;
     }
