@@ -1,11 +1,11 @@
-package recon.files.impl;
+package bdd.system;
 
 import com.google.inject.AbstractModule;
-import recon.files.ComparesFiles;
+import recon.ComparesInputs;
 
 public class Module extends AbstractModule {
     @Override
     protected void configure() {
-        bind(ComparesFiles.class).to(ComparesFilesAsInputs.class);
+        bind(ComparesInputs.class).to(ComparesInputsUsingFiles.class);
     }
 }

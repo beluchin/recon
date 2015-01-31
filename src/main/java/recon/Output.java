@@ -1,4 +1,4 @@
-package recon.datamodel;
+package recon;
 
 public interface Output {
 }

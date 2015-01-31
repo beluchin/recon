@@ -25,9 +25,14 @@ public abstract class AbstractBddTest {
     }
 
     private Iterable<Module> getModules() {
-        return ImmutableList.<Module>of(
-                new recon.impl.Module(),
-                new recon.datamodel.impl.Module());
+        switch (getBddTarget()) {
+            case BusLogic:
+                return getBusLogicModules();
+            case System:
+                return getSystemModules();
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 
     private static BddTarget getBddTarget() {
@@ -36,11 +41,23 @@ public abstract class AbstractBddTest {
         return BddTarget.valueOf((String) p.getProperty("bddTarget"));
     }
 
+    private static Iterable<Module> getBusLogicModules() {
+        return ImmutableList.<Module>of(
+                new recon.internal.Module());
+    }
+
     private static PropertiesConfiguration getPropertiesConfiguration(final String fileName) {
         try {
             return new PropertiesConfiguration(fileName);
         } catch (ConfigurationException e) {
             throw propagate(e);
         }
+    }
+
+    private static Iterable<Module> getSystemModules() {
+        return ImmutableList.<Module> of(
+                new bdd.system.Module(),
+                new recon.adapter.files.Module()
+                );
     }
 }

@@ -1,18 +1,19 @@
-package bdd;
+package bdd.tests;
 
+import bdd.AbstractBddTest;
 import com.google.common.base.Stopwatch;
 import org.junit.Before;
 import org.junit.Test;
 import recon.ComparesInputs;
-import recon.datamodel.Output;
-import recon.datamodel.Input;
+import recon.Input;
+import recon.Output;
 
 import java.util.stream.Stream;
 
-import static bdd.datamodel.impl.InputUtils.data;
-import static bdd.datamodel.impl.InputUtils.dataRow;
-import static bdd.datamodel.impl.InputUtils.schema;
-import static bdd.datamodel.impl.InputUtils.toInput;
+import static bdd.datamodel.InputUtils.data;
+import static bdd.datamodel.InputUtils.dataRow;
+import static bdd.datamodel.InputUtils.schema;
+import static bdd.datamodel.InputUtils.toInput;
 import static com.google.common.base.Stopwatch.createStarted;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -37,7 +38,7 @@ public class NoConfigTest extends AbstractBddTest {
     }
 
     @Test
-    public void _2_nonNullOutputFilesAreNotIdentical() {
+    public void _2_outputIfInputsAreNotIdentical() {
         Input lhs = toInput(
                 schema("Column1"),
                 dataRow("Hello"));

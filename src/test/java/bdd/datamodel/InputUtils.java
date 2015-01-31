@@ -1,10 +1,12 @@
-package bdd.datamodel.impl;
+package bdd.datamodel;
 
-import recon.datamodel.Input;
-import recon.datamodel.Input.DataRow;
-import recon.datamodel.Input.Schema;
+import com.google.common.collect.ImmutableList;
+import recon.Input;
+import recon.Input.DataRow;
+import recon.Input.Schema;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class InputUtils {
@@ -15,18 +17,17 @@ public class InputUtils {
 
     public static DataRow dataRow(final String csv) {
         return new DataRow() {
-            private final String[] tokens = csv.split(",");
+            private final List<String> tokens = ImmutableList.copyOf(csv.split(","));
 
             @Override
-            public String get(final int index) {
-                return tokens[index];
+            public List<String> get() {
+                return tokens;
             }
         };
     }
 
     public static Schema schema(final String csv) {
-        return new Schema() {
-        };
+        return () -> ImmutableList.of(csv);
     }
 
     public static Input toInput(final Schema schema, final DataRow... dataRows) {

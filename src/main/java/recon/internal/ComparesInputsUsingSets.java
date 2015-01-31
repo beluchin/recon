@@ -1,10 +1,10 @@
-package recon.impl;
+package recon.internal;
 
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSet;
 import recon.ComparesInputs;
-import recon.datamodel.Output;
-import recon.datamodel.Input;
+import recon.Input;
+import recon.Output;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -55,19 +55,22 @@ class ComparesInputsUsingSets implements ComparesInputs {
         return null;
     }
 
-    private ImmutableSet<Integer> getKeyDefinition(final Input lhs, final Input rhs) {
+    private ImmutableSet<Integer> getKeyDefinition(
+            final Input lhs, final Input rhs) {
         return ImmutableSet.of(0);
     }
 
-    private Set<Key> getKeys(final Input input, final Set<Integer> keyDefinition) {
+    private Set<Key> getKeys(
+            final Input input, final Set<Integer> keyDefinition) {
         return input.getData().map(r -> getKey(r, keyDefinition))
                 .collect(toSet());
     }
 
     private Key getKey(final Input.DataRow r, final Set<Integer> keyDefinition) {
         Builder<String> builder = new Builder<>();
+        final List<String> strings = r.get();
         for (int index: keyDefinition) {
-            builder.add(r.get(index));
+            builder.add(strings.get(index));
         }
         return new Key(builder.build());
     }

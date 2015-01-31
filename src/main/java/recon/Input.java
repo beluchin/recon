@@ -1,13 +1,15 @@
-package recon.datamodel;
+package recon;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 public interface Input {
     interface Schema {
+        List<String> get();
     }
 
     interface DataRow {
-        String get(final int index);
+        List<String> get();
     }
 
     Schema getSchema();
