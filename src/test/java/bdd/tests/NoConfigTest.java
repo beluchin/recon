@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import recon.ComparesInputs;
 import recon.Input;
-import recon.Output;
+import recon.ExcelWorkbook;
 
 import java.util.stream.Stream;
 
@@ -33,7 +33,7 @@ public class NoConfigTest extends AbstractBddTest {
         Input input = toInput(
                 schema("Column1"),
                 dataRow("Hello"));
-        Output result = comparesInputs.recon(input, input);
+        ExcelWorkbook result = comparesInputs.recon(input, input);
         assertThat(result, is(nullValue()));
     }
 
@@ -45,7 +45,7 @@ public class NoConfigTest extends AbstractBddTest {
         Input rhs = toInput(
                 schema("Column1"),
                 dataRow("World"));
-        Output result = comparesInputs.recon(lhs, rhs);
+        ExcelWorkbook result = comparesInputs.recon(lhs, rhs);
         assertThat(result, is(not(nullValue())));
     }
 
@@ -59,7 +59,7 @@ public class NoConfigTest extends AbstractBddTest {
                 data(uniqueStrings));
 
         Stopwatch stopwatch = createStarted();
-        Output result = comparesInputs.recon(input, input);
+        ExcelWorkbook result = comparesInputs.recon(input, input);
         stopwatch.stop();
         assertThat(stopwatch.elapsed(SECONDS), is(lessThan(10L)));
         assertThat(result, is(nullValue()));

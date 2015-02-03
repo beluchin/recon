@@ -3,7 +3,7 @@ package recon.internal;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import recon.ComparesInputs;
-import recon.Output;
+import recon.ExcelWorkbook;
 
 public class Module extends AbstractModule {
     @Override
@@ -12,7 +12,7 @@ public class Module extends AbstractModule {
     }
 
     @Provides
-    Output output() {
-        return new Output() {};
+    ExcelWorkbook excelWorkbook() {
+        return new ExcelWorkbook() {};
     }
 }
