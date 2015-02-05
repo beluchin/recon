@@ -1,12 +1,13 @@
 package bdd.tests;
 
 import bdd.AbstractBddTest;
+import bdd.datamodel.BddExcelWorkbook;
 import com.google.common.base.Stopwatch;
 import org.junit.Before;
 import org.junit.Test;
 import recon.ComparesInputs;
+import recon.ExcelWorkbook;
 import recon.Input;
-import recon.Output;
 
 import java.util.stream.Stream;
 
@@ -30,36 +31,49 @@ public class NoConfigTest extends AbstractBddTest {
 
     @Test
     public void _1_noOutputIfInputsAreIdentical() {
-        Input input = toInput(
+        final Input input = toInput(
                 schema("Column1"),
                 dataRow("Hello"));
-        Output result = comparesInputs.recon(input, input);
+        final ExcelWorkbook result = comparesInputs.recon(input, input);
         assertThat(result, is(nullValue()));
     }
 
     @Test
     public void _2_outputIfInputsAreNotIdentical() {
-        Input lhs = toInput(
+        final Input lhs = toInput(
                 schema("Column1"),
                 dataRow("Hello"));
-        Input rhs = toInput(
+        final Input rhs = toInput(
                 schema("Column1"),
                 dataRow("World"));
-        Output result = comparesInputs.recon(lhs, rhs);
+        final ExcelWorkbook result = comparesInputs.recon(lhs, rhs);
         assertThat(result, is(not(nullValue())));
     }
 
     @Test
-    public void _3_performanceOnlyKeys() {
+    public void _3_workbookHasDataWorksheet() {
+        final Input lhs = toInput(
+                schema("Column1"),
+                dataRow("Hello"));
+        final Input rhs = toInput(
+                schema("Column1"),
+                dataRow("World"));
+        final BddExcelWorkbook result = (BddExcelWorkbook) comparesInputs.recon(lhs, rhs);
+        //noinspection ConstantConditions
+        assertThat(result.getSheet("data"), is(not(nullValue())));
+    }
+
+    @Test
+    public void performanceOnlyKeys() {
         final long _50K = 50000;
         final Stream<String> uniqueStrings = generate(NoConfigTest::randomString)
                 .limit(_50K);
-        Input input = toInput(
+        final Input input = toInput(
                 schema("Column1"),
                 data(uniqueStrings));
 
-        Stopwatch stopwatch = createStarted();
-        Output result = comparesInputs.recon(input, input);
+        final Stopwatch stopwatch = createStarted();
+        final ExcelWorkbook result = comparesInputs.recon(input, input);
         stopwatch.stop();
         assertThat(stopwatch.elapsed(SECONDS), is(lessThan(10L)));
         assertThat(result, is(nullValue()));

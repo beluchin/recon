@@ -1,15 +1,21 @@
 package bdd.system;
 
-import recon.Output;
+import recon.ExcelWorkbook;
 
 import javax.annotation.Nullable;
 import java.io.File;
 
-class ConvertsToOutput {
-    @Nullable public Output convert(final String fileName) {
+class ConvertsToExcelWorkbook {
+    @Nullable
+    public ExcelWorkbook convert(final String fileName) {
         File f = new File(fileName);
         return f.exists() && !f.isDirectory()
-                ? new Output() {}
+                ? new ExcelWorkbook() {
+                    @Override
+                    public void addSheet(final String name) {
+                        throw new UnsupportedOperationException();
+                    }
+                }
                 : null;
     }
 }
