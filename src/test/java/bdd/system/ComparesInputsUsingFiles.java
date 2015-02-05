@@ -4,7 +4,7 @@ import bdd.system.utils.FileUtils;
 import recon.ComparesInputs;
 import recon.ExcelWorkbook;
 import recon.Input;
-import recon.adapters.app.App;
+import recon.adapter.app.App;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -36,10 +36,10 @@ class ComparesInputsUsingFiles implements ComparesInputs {
         final String lhsFilename = toTempFile(lhs);
         final String rhsFilename = toTempFile(rhs);
         app.main(new String[]{lhsFilename, rhsFilename});
-        return getOutputFromOutputFile();
+        return getWorkbookFromOutputFile();
     }
 
-    private ExcelWorkbook getOutputFromOutputFile() {
+    private ExcelWorkbook getWorkbookFromOutputFile() {
         return convertsToExcelWorkbook.convert(defaultOutputFilename);
     }
 

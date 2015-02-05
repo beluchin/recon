@@ -4,9 +4,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import recon.ComparesInputs;
+import recon.ExcelWorkbook;
 import recon.Input;
 import recon.Input.DataRow;
 import recon.Input.Schema;
+import recon.adapter.datamodel.PoiWorkbook;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,10 +41,11 @@ public class ComparesFiles {
     public void apply(final String lhsFilename, final String rhsFilename) {
         final Input lhsInput = toInput(lhsFilename);
         final Input rhsInput = toInput(rhsFilename);
-
         removeEmptyDefaultOutputFile();
-        if (comparesInputs.recon(lhsInput, rhsInput) != null) {
-            createEmptyDefaultOutputFile();
+        final PoiWorkbook workbook = (PoiWorkbook) comparesInputs.recon(
+                lhsInput, rhsInput);
+        if (workbook != null) {
+            workbook.save(defaultOutputFilename);
         }
     }
 

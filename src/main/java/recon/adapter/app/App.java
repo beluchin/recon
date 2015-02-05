@@ -1,4 +1,4 @@
-package recon.adapters.app;
+package recon.adapter.app;
 
 import recon.adapter.files.ComparesFiles;
 import recon.internal.Module;
@@ -18,6 +18,7 @@ public final class App {
     private static ComparesFiles getComparer() {
         return createInjector(
                 new recon.adapter.files.Module(),
+                new recon.adapter.poi.Module(),
                 new Module())
                 .getInstance(ComparesFiles.class);
     }
