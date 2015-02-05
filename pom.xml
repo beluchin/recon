@@ -92,7 +92,7 @@
 
             See: https://github.com/google/guice/issues/757
             -->
-            <!--<classifier>no_aop</classifier>-->
+            <classifier>no_aop</classifier>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>

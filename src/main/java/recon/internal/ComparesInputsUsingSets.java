@@ -3,12 +3,12 @@ package recon.internal;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSet;
 import recon.ComparesInputs;
-import recon.Input;
 import recon.ExcelWorkbook;
+import recon.Input;
+import recon.internal.deps.BuildsExcelWorkbook;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.List;
 import java.util.Set;
 
@@ -37,22 +37,28 @@ class ComparesInputsUsingSets implements ComparesInputs {
         }
     }
 
-    private final Provider<ExcelWorkbook> workbookProvider;
+    private final BuildsExcelWorkbook buildsWorkbook;
 
     @Inject
-    ComparesInputsUsingSets(final Provider<ExcelWorkbook> workbookProvider) {
-        this.workbookProvider = workbookProvider;
+    ComparesInputsUsingSets(final BuildsExcelWorkbook buildsWorkbook) {
+        this.buildsWorkbook = buildsWorkbook;
     }
 
     public @Nullable
     ExcelWorkbook recon(final Input rhs, final Input lhs) {
-        Set<Integer> keyDefinition = getKeyDefinition(lhs, rhs);
-        Set<Key> lhsKeys = getKeys(lhs, keyDefinition);
-        Set<Key> rhsKeys = getKeys(rhs, keyDefinition);
+        final Set<Integer> keyDefinition = getKeyDefinition(lhs, rhs);
+        final Set<Key> lhsKeys = getKeys(lhs, keyDefinition);
+        final Set<Key> rhsKeys = getKeys(rhs, keyDefinition);
         if (existsPopulationBreaks(lhsKeys, rhsKeys)) {
-            return workbookProvider.get();
+            return buildWorkbook();
         }
         return null;
+    }
+
+    private ExcelWorkbook buildWorkbook() {
+        final ExcelWorkbook result = buildsWorkbook.build();
+        result.addSheet("data");
+        return result;
     }
 
     private ImmutableSet<Integer> getKeyDefinition(
@@ -67,9 +73,9 @@ class ComparesInputsUsingSets implements ComparesInputs {
     }
 
     private Key getKey(final Input.DataRow r, final Set<Integer> keyDefinition) {
-        Builder<String> builder = new Builder<>();
+        final Builder<String> builder = new Builder<>();
         final List<String> strings = r.get();
-        for (int index: keyDefinition) {
+        for (final int index: keyDefinition) {
             builder.add(strings.get(index));
         }
         return new Key(builder.build());

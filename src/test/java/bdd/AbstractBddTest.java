@@ -43,7 +43,8 @@ public abstract class AbstractBddTest {
 
     private static Iterable<Module> getBusLogicModules() {
         return ImmutableList.<Module>of(
-                new recon.internal.Module());
+                new recon.internal.Module(),
+                new bdd.buslogic.Module());
     }
 
     private static PropertiesConfiguration getPropertiesConfiguration(final String fileName) {

@@ -1,10 +1,10 @@
 package bdd.system;
 
 import bdd.system.utils.FileUtils;
-import recon.adapters.app.App;
 import recon.ComparesInputs;
-import recon.Input;
 import recon.ExcelWorkbook;
+import recon.Input;
+import recon.adapters.app.App;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -30,9 +30,9 @@ class ComparesInputsUsingFiles implements ComparesInputs {
         this.fileUtils = fileUtils;
     }
 
-    @Nullable
+
     @Override
-    public ExcelWorkbook recon(final Input lhs, final Input rhs) {
+    public @Nullable ExcelWorkbook recon(final Input lhs, final Input rhs) {
         final String lhsFilename = toTempFile(lhs);
         final String rhsFilename = toTempFile(rhs);
         app.main(new String[]{lhsFilename, rhsFilename});
