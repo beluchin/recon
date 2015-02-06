@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
-public class NoConfigNoDataTest extends AbstractBddTest {
+public class SingleColumnKeyNoDataTest extends AbstractBddTest {
 
     private ComparesInputs comparesInputs;
 
@@ -66,7 +66,7 @@ public class NoConfigNoDataTest extends AbstractBddTest {
     @Test
     public void performanceOnlyKeys() {
         final long _50K = 50000;
-        final Stream<String> uniqueStrings = generate(NoConfigNoDataTest::randomString)
+        final Stream<String> uniqueStrings = generate(SingleColumnKeyNoDataTest::randomString)
                 .limit(_50K);
         final Input input = toInput(
                 schema("Column1"),
