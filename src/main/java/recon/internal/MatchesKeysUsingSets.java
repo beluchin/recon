@@ -1,11 +1,9 @@
 package recon.internal;
 
-import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import recon.ComparesInputs;
-import recon.ExcelWorkbook;
 import recon.Input;
-import recon.internal.deps.BuildsExcelWorkbook;
+import recon.internal.datamodel.KeyMatchingOutput;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -15,7 +13,7 @@ import java.util.Set;
 import static com.google.common.collect.Sets.difference;
 import static java.util.stream.Collectors.toSet;
 
-class ComparesInputsUsingSets implements ComparesInputs {
+class MatchesKeysUsingSets {
     private static class Key {
         private final List<String> strings;
 
@@ -37,32 +35,24 @@ class ComparesInputsUsingSets implements ComparesInputs {
         }
     }
 
-    private final BuildsExcelWorkbook buildsWorkbook;
+    private final BuildsKeyMatchingOutput buildsKeyMatchingOutput;
 
     @Inject
-    ComparesInputsUsingSets(final BuildsExcelWorkbook buildsWorkbook) {
-        this.buildsWorkbook = buildsWorkbook;
+    MatchesKeysUsingSets(final BuildsKeyMatchingOutput buildsKeyMatchingOutput) {
+        this.buildsKeyMatchingOutput = buildsKeyMatchingOutput;
     }
 
-    public @Nullable
-    ExcelWorkbook recon(final Input rhs, final Input lhs) {
+    public @Nullable KeyMatchingOutput matchKeys(final Input rhs, final Input lhs) {
         final Set<Integer> keyDefinition = getKeyDefinition(lhs, rhs);
         final Set<Key> lhsKeys = getKeys(lhs, keyDefinition);
         final Set<Key> rhsKeys = getKeys(rhs, keyDefinition);
-        if (existsPopulationBreaks(lhsKeys, rhsKeys)) {
-            return buildWorkbook();
-        }
-        return null;
+        return existsPopulationBreaks(lhsKeys, rhsKeys)
+                ? buildsKeyMatchingOutput.build()
+                : null;
     }
 
-    private ExcelWorkbook buildWorkbook() {
-        final ExcelWorkbook result = buildsWorkbook.build();
-        result.addSheet("data");
-        return result;
-    }
-
-    private ImmutableSet<Integer> getKeyDefinition(
-            final Input lhs, final Input rhs) {
+    @SuppressWarnings("UnusedParameters")
+    private ImmutableSet<Integer> getKeyDefinition(final Input lhs, final Input rhs) {
         return ImmutableSet.of(0);
     }
 
@@ -73,7 +63,7 @@ class ComparesInputsUsingSets implements ComparesInputs {
     }
 
     private Key getKey(final Input.DataRow r, final Set<Integer> keyDefinition) {
-        final Builder<String> builder = new Builder<>();
+        final ImmutableList.Builder<String> builder = new ImmutableList.Builder<>();
         final List<String> strings = r.get();
         for (final int index: keyDefinition) {
             builder.add(strings.get(index));

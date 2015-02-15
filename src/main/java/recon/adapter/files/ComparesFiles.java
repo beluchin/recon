@@ -3,8 +3,7 @@ package recon.adapter.files;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import recon.ComparesInputs;
-import recon.ExcelWorkbook;
+import recon.BuildsWorkbookFromInputs;
 import recon.Input;
 import recon.Input.DataRow;
 import recon.Input.Schema;
@@ -26,15 +25,15 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.Throwables.propagate;
 
 public class ComparesFiles {
-    private final ComparesInputs comparesInputs;
+    private final BuildsWorkbookFromInputs buildsWorkbookFromInputs;
     private String defaultOutputFilename;
 
     @Inject
     public ComparesFiles(
-            final ComparesInputs comparesInputs,
+            final BuildsWorkbookFromInputs buildsWorkbookFromInputs,
             @Named("recon.app.defaultOutputFilename")
                     final String defaultOutputFilename) {
-        this.comparesInputs = comparesInputs;
+        this.buildsWorkbookFromInputs = buildsWorkbookFromInputs;
         this.defaultOutputFilename = defaultOutputFilename;
     }
 
@@ -42,7 +41,7 @@ public class ComparesFiles {
         final Input lhsInput = toInput(lhsFilename);
         final Input rhsInput = toInput(rhsFilename);
         removeEmptyDefaultOutputFile();
-        final PoiWorkbook workbook = (PoiWorkbook) comparesInputs.recon(
+        final PoiWorkbook workbook = (PoiWorkbook) buildsWorkbookFromInputs.recon(
                 lhsInput, rhsInput);
         if (workbook != null) {
             workbook.save(defaultOutputFilename);

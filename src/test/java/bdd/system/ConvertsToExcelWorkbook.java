@@ -1,8 +1,8 @@
 package bdd.system;
 
-import bdd.datamodel.BddExcelWorkbook;
+import bdd.datamodel.BddWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import recon.ExcelWorkbook;
+import recon.Workbook;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -14,21 +14,16 @@ import static com.google.common.base.Throwables.propagate;
 
 class ConvertsToExcelWorkbook {
     @Nullable
-    public ExcelWorkbook convert(final String fileName) {
+    public Workbook convert(final String fileName) {
         if (!fileExists(fileName)) {
             return null;
         }
 
         final HSSFWorkbook w = getHssfWorkbook(fileName);
-        return new BddExcelWorkbook() {
+        return new BddWorkbook() {
             @Override
             public @Nullable String getSheet(final String name) {
                 return w.getSheet(name) != null? name: null;
-            }
-
-            @Override
-            public void addSheet(final String name) {
-                w.createSheet(name);
             }
         };
     }

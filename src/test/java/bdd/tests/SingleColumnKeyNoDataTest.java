@@ -1,12 +1,12 @@
 package bdd.tests;
 
 import bdd.AbstractBddTest;
-import bdd.datamodel.BddExcelWorkbook;
+import bdd.datamodel.BddWorkbook;
 import com.google.common.base.Stopwatch;
 import org.junit.Before;
 import org.junit.Test;
-import recon.ComparesInputs;
-import recon.ExcelWorkbook;
+import recon.BuildsWorkbookFromInputs;
+import recon.Workbook;
 import recon.Input;
 
 import java.util.stream.Stream;
@@ -27,14 +27,14 @@ import static org.hamcrest.Matchers.nullValue;
 
 public class SingleColumnKeyNoDataTest extends AbstractBddTest {
 
-    private ComparesInputs comparesInputs;
+    private BuildsWorkbookFromInputs buildsWorkbookFromInputs;
 
     @Test
     public void _1_noOutputIfInputsAreIdentical() {
         final Input input = toInput(
                 schema("Column1"),
                 dataRow("Hello"));
-        final ExcelWorkbook result = comparesInputs.recon(input, input);
+        final Workbook result = buildsWorkbookFromInputs.recon(input, input);
         assertThat(result, is(nullValue()));
     }
 
@@ -46,7 +46,7 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
         final Input rhs = toInput(
                 schema("Column1"),
                 dataRow("World"));
-        final ExcelWorkbook result = comparesInputs.recon(lhs, rhs);
+        final Workbook result = buildsWorkbookFromInputs.recon(lhs, rhs);
         assertThat(result, is(not(nullValue())));
     }
 
@@ -58,7 +58,7 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
         final Input rhs = toInput(
                 schema("Column1"),
                 dataRow("World"));
-        final BddExcelWorkbook result = (BddExcelWorkbook) comparesInputs.recon(lhs, rhs);
+        final BddWorkbook result = (BddWorkbook) buildsWorkbookFromInputs.recon(lhs, rhs);
         //noinspection ConstantConditions
         assertThat(result.getSheet("data"), is(not(nullValue())));
     }
@@ -73,7 +73,7 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
                 data(uniqueStrings));
 
         final Stopwatch stopwatch = createStarted();
-        final ExcelWorkbook result = comparesInputs.recon(input, input);
+        final Workbook result = buildsWorkbookFromInputs.recon(input, input);
         stopwatch.stop();
         assertThat(stopwatch.elapsed(SECONDS), is(lessThan(10L)));
         assertThat(result, is(nullValue()));
@@ -81,7 +81,7 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
 
     @Before
     public void setUp() {
-        comparesInputs = getInstance(ComparesInputs.class);
+        buildsWorkbookFromInputs = getInstance(BuildsWorkbookFromInputs.class);
     }
 
     private static String randomString() {

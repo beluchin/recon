@@ -1,11 +1,11 @@
 package recon.internal;
 
 import com.google.inject.AbstractModule;
-import recon.ComparesInputs;
+import recon.BuildsWorkbookFromInputs;
 
 public class Module extends AbstractModule {
     @Override
     protected void configure() {
-        bind(ComparesInputs.class).to(ComparesInputsUsingSets.class);
+        bind(BuildsWorkbookFromInputs.class).to(BuildsWorkbookFromInputsImpl.class);
     }
 }

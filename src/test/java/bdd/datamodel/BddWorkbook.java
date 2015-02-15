@@ -1,9 +1,9 @@
 package bdd.datamodel;
 
-import recon.ExcelWorkbook;
+import recon.Workbook;
 
 import javax.annotation.Nullable;
 
-public interface BddExcelWorkbook extends ExcelWorkbook {
+public interface BddWorkbook extends Workbook {
     @Nullable String getSheet(String data);
 }

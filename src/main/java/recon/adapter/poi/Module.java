@@ -7,11 +7,13 @@
 package recon.adapter.poi;
 
 import com.google.inject.AbstractModule;
-import recon.internal.deps.BuildsExcelWorkbook;
+import recon.internal.deps.BuildsWorkbook;
+import recon.internal.deps.BuildsWorksheet;
 
 public class Module extends AbstractModule {
     @Override
     protected void configure() {
-        bind(BuildsExcelWorkbook.class).to(BuildsPoiWorkbook.class);
+        bind(BuildsWorkbook.class).to(BuildsPoiWorkbook.class);
+        bind(BuildsWorksheet.class).to(BuildsPoiWorksheet.class);
     }
 }
