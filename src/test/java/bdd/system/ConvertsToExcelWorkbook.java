@@ -1,6 +1,8 @@
 package bdd.system;
 
 import bdd.datamodel.BddWorkbook;
+import bdd.datamodel.BddWorksheet;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import recon.Workbook;
 
@@ -22,8 +24,9 @@ class ConvertsToExcelWorkbook {
         final HSSFWorkbook w = getHssfWorkbook(fileName);
         return new BddWorkbook() {
             @Override
-            public @Nullable String getSheet(final String name) {
-                return w.getSheet(name) != null? name: null;
+            public @Nullable BddWorksheet getSheet(final String name) {
+                // TODO
+                throw new UnsupportedOperationException();
             }
         };
     }

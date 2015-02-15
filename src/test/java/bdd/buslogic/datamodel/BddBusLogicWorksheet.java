@@ -1,8 +1,10 @@
 package bdd.buslogic.datamodel;
 
-import recon.internal.datamodel.Worksheet;
+import bdd.datamodel.BddWorksheet;
 
-public class BddBusLogicWorksheet implements Worksheet {
+import java.util.List;
+
+public class BddBusLogicWorksheet implements BddWorksheet {
     private final String name;
 
     public BddBusLogicWorksheet(final String name) {
@@ -11,5 +13,11 @@ public class BddBusLogicWorksheet implements Worksheet {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public List<String> getRow(final int i) {
+        // TODO: not implemented
+        throw new UnsupportedOperationException();
     }
 }

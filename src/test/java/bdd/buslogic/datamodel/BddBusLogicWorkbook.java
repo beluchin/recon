@@ -1,10 +1,10 @@
 package bdd.buslogic.datamodel;
 
 import bdd.datamodel.BddWorkbook;
-import recon.internal.datamodel.Worksheet;
+import bdd.datamodel.BddWorksheet;
 
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class BddBusLogicWorkbook implements BddWorkbook {
@@ -15,8 +15,13 @@ public class BddBusLogicWorkbook implements BddWorkbook {
     }
 
     @Override
-    public @Nullable String getSheet(final String name) {
-        return worksheets.filter(s -> s.getName().equals(name)).findFirst().isPresent()
-                ? name: null;
+    public @Nullable BddWorksheet getSheet(final String name) {
+        final Optional<BddBusLogicWorksheet> sheet = worksheets
+                .filter(s -> s.getName().equals(name))
+                .findFirst();
+        if (!sheet.isPresent()) {
+            return null;
+        }
+        return sheet.get();
     }
 }
