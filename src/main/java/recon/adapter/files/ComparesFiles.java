@@ -1,7 +1,6 @@
 package recon.adapter.files;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import recon.BuildsWorkbookFromInputs;
 import recon.Input;
@@ -16,17 +15,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Throwables.propagate;
+import static com.google.common.collect.Lists.newArrayList;
 
 public class ComparesFiles {
     private final BuildsWorkbookFromInputs buildsWorkbookFromInputs;
-    private String defaultOutputFilename;
+    private final String defaultOutputFilename;
 
     @Inject
     public ComparesFiles(
@@ -48,17 +47,10 @@ public class ComparesFiles {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressFBWarnings({"RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"})
     private void removeEmptyDefaultOutputFile() {
         new File(defaultOutputFilename).delete();
-    }
-
-    private void createEmptyDefaultOutputFile() {
-        try {
-            new File(defaultOutputFilename).createNewFile();
-        } catch (IOException e) {
-            throw propagate(e);
-        }
     }
 
     @SuppressFBWarnings({"DM_DEFAULT_ENCODING"})
@@ -93,12 +85,7 @@ public class ComparesFiles {
     }
 
     private static DataRow toDataRow(final String line) {
-        return new DataRow() {
-            @Override
-            public List<String> get() {
-                return Lists.newArrayList(line.split(","));
-            }
-        };
+        return () -> newArrayList(line.split(","));
     }
 
     private static Input toInput(final String lhsFilename) {
@@ -123,11 +110,6 @@ public class ComparesFiles {
     }
 
     private static Schema toSchema(final String csv) {
-        return new Schema() {
-            @Override
-            public List<String> get() {
-                return ImmutableList.<String> of();
-            }
-        };
+        return () -> ImmutableList.copyOf(csv.split(","));
     }
 }

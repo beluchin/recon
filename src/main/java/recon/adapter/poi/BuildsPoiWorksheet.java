@@ -5,16 +5,11 @@ import recon.internal.datamodel.Worksheet;
 import recon.internal.deps.BuildsWorksheet;
 
 import java.util.List;
+import java.util.Map;
 
-public class BuildsPoiWorksheet implements BuildsWorksheet {
+class BuildsPoiWorksheet implements BuildsWorksheet {
     @Override
-    public Worksheet build(String name) {
-        return new PoiWorksheet(name);
-    }
-
-    @Override
-    public BuildsWorksheet row(final int i, final List<String> values) {
-        // TODO: not implemented
-        throw new UnsupportedOperationException();
+    public Worksheet build(String name, final Map<Integer, List<String>> rows) {
+        return new PoiWorksheet(name, rows);
     }
 }

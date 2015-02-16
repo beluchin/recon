@@ -13,19 +13,19 @@ import javax.inject.Named;
 @SuppressWarnings("AccessStaticViaInstance")
 class BuildsWorkbookFromInputsUsingFiles implements BuildsWorkbookFromInputs {
     private final App app;
-    private final ConvertsToExcelWorkbook convertsToExcelWorkbook;
+    private final ConvertsToWorkbook convertsToWorkbook;
     private final String defaultOutputFilename;
     private final FileUtils fileUtils;
 
     @Inject
     BuildsWorkbookFromInputsUsingFiles(
             final App app,
-            final ConvertsToExcelWorkbook convertsToExcelWorkbook,
+            final ConvertsToWorkbook convertsToWorkbook,
             @Named("recon.app.defaultOutputFilename")
             final String defaultOutputFilename,
             final FileUtils fileUtils) {
         this.app = app;
-        this.convertsToExcelWorkbook = convertsToExcelWorkbook;
+        this.convertsToWorkbook = convertsToWorkbook;
         this.defaultOutputFilename = defaultOutputFilename;
         this.fileUtils = fileUtils;
     }
@@ -41,7 +41,7 @@ class BuildsWorkbookFromInputsUsingFiles implements BuildsWorkbookFromInputs {
     }
 
     private Workbook getWorkbookFromOutputFile() {
-        return convertsToExcelWorkbook.convert(defaultOutputFilename);
+        return convertsToWorkbook.convert(defaultOutputFilename);
     }
 
     private String toTempFile(final Input input) {

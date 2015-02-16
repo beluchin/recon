@@ -1,6 +1,6 @@
 package recon.adapter.datamodel;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import recon.Workbook;
 
 import java.io.FileNotFoundException;
@@ -10,16 +10,18 @@ import java.io.IOException;
 import static com.google.common.base.Throwables.propagate;
 
 public class PoiWorkbook implements Workbook {
-    private final HSSFWorkbook workbook;
+    private final XSSFWorkbook workbook;
 
-    public PoiWorkbook(final HSSFWorkbook workbook) {
+    public PoiWorkbook(final XSSFWorkbook workbook) {
         this.workbook = workbook;
     }
 
     public void save(final String filename) {
         try {
-            workbook.write(getStream(filename));
-        } catch (IOException e) {
+            final FileOutputStream stream = getStream(filename);
+            workbook.write(stream);
+            stream.close();
+        } catch (final IOException e) {
             throw propagate(e);
         }
     }
@@ -27,7 +29,7 @@ public class PoiWorkbook implements Workbook {
     private FileOutputStream getStream(final String filename) {
         try {
             return new FileOutputStream(filename);
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             throw propagate(e);
         }
     }

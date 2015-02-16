@@ -65,6 +65,7 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
         assertThat(result.getSheet("data"), is(not(nullValue())));
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     public void _4_columnsOnDataWorksheet() {
         final Input lhs = toInput(

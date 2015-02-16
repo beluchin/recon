@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-public class BuildsBddWorkbook implements BuildsWorkbook {
+class BuildsBddWorkbook implements BuildsWorkbook {
     @Override
     public Workbook build(final Worksheet... worksheets) {
         final Stream<BddBusLogicWorksheet> bddWorksheets = newArrayList(worksheets)
