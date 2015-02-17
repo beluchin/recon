@@ -82,7 +82,7 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
     }
 
     @Test
-    public void performanceOnlyKeys() {
+    public void performanceOnlyKeysNoBreaks() {
         final long _50K = 50000;
         final Stream<String> uniqueStrings = generate(SingleColumnKeyNoDataTest::randomString)
                 .limit(_50K);
