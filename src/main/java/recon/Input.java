@@ -12,6 +12,7 @@ public interface Input {
         List<String> get();
     }
 
+    String getName();
     Schema getSchema();
     Stream<DataRow> getData();
 }

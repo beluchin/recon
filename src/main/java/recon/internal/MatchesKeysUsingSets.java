@@ -1,13 +1,10 @@
 package recon.internal;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import recon.Input;
 import recon.internal.datamodel.KeyMatchingOutput;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.difference;
@@ -15,10 +12,10 @@ import static java.util.stream.Collectors.toSet;
 
 class MatchesKeysUsingSets {
     private static class Key {
-        private final List<String> strings;
+        private final Input.DataRow row;
 
-        public Key(final List<String> strings) {
-            this.strings = strings;
+        public Key(final Input.DataRow row) {
+            this.row = row;
         }
 
         @Override
@@ -26,12 +23,16 @@ class MatchesKeysUsingSets {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             final Key key = (Key) o;
-            return strings.equals(key.strings);
+            return getToken(0).equals(key.getToken(0));
         }
 
         @Override
         public int hashCode() {
-            return strings.hashCode();
+            return getToken(0).hashCode();
+        }
+
+        private String getToken(final int index) {
+            return row.get().get(index);
         }
     }
 
@@ -42,33 +43,21 @@ class MatchesKeysUsingSets {
         this.buildsKeyMatchingOutput = buildsKeyMatchingOutput;
     }
 
-    public @Nullable KeyMatchingOutput matchKeys(final Input rhs, final Input lhs) {
-        final Set<Integer> keyDefinition = getKeyDefinition(lhs, rhs);
-        final Set<Key> lhsKeys = getKeys(lhs, keyDefinition);
-        final Set<Key> rhsKeys = getKeys(rhs, keyDefinition);
+    public @Nullable KeyMatchingOutput matchKeys(final Input lhs, final Input rhs) {
+
+        // the inputs may not have the columns in order.
+        // no need to worry about that now. The inputs only have one column
+        // for the current milestone.
+
+        final Set<Key> lhsKeys = getKeys(lhs);
+        final Set<Key> rhsKeys = getKeys(rhs);
         return existsPopulationBreaks(lhsKeys, rhsKeys)
                 ? buildsKeyMatchingOutput.build()
                 : null;
     }
 
-    @SuppressWarnings("UnusedParameters")
-    private ImmutableSet<Integer> getKeyDefinition(final Input lhs, final Input rhs) {
-        return ImmutableSet.of(0);
-    }
-
-    private Set<Key> getKeys(
-            final Input input, final Set<Integer> keyDefinition) {
-        return input.getData().map(r -> getKey(r, keyDefinition))
-                .collect(toSet());
-    }
-
-    private Key getKey(final Input.DataRow r, final Set<Integer> keyDefinition) {
-        final ImmutableList.Builder<String> builder = new ImmutableList.Builder<>();
-        final List<String> strings = r.get();
-        for (final int index: keyDefinition) {
-            builder.add(strings.get(index));
-        }
-        return new Key(builder.build());
+    private Set<Key> getKeys(final Input input) {
+        return input.getData().map(Key::new).collect(toSet());
     }
 
     private static boolean existsPopulationBreaks(

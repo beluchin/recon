@@ -82,6 +82,26 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
     }
 
     @Test
+    public void _5_commonRecordsOnDataSheet() {
+        final Input lhs = toInput(
+                "LHS",
+                schema("Column1"),
+                dataRow("Hello"));
+        final Input rhs = toInput(
+                "RHS",
+                schema("Column1"),
+                dataRow("Hello"),
+                dataRow("World"));
+        final BddWorkbook workbook = (BddWorkbook) buildsWorkbookFromInputs.recon(
+                lhs, rhs);
+        final BddWorksheet worksheet = workbook.getSheet("data");
+        assertThat(worksheet.getRow(1), is(ImmutableList.of(
+                "Hello", "LHS", "common")));
+        assertThat(worksheet.getRow(2), is(ImmutableList.of(
+                "Hello", "RHS", "common")));
+    }
+
+    @Test
     public void performanceOnlyKeysNoBreaks() {
         final long _50K = 50000;
         final Stream<String> uniqueStrings = generate(SingleColumnKeyNoDataTest::randomString)

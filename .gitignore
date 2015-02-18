@@ -67,3 +67,6 @@ hs_err_pid*
 #excel files
 *.xlsx
 
+# used as reminder of what I am working on
+README
+

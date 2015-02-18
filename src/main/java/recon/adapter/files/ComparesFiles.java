@@ -70,6 +70,11 @@ public class ComparesFiles {
         }
     }
 
+    private static String removeExtension(final String filename) {
+        final int i = filename.lastIndexOf('.');
+        return i != -1? filename.substring(0, i): filename;
+    }
+
     private static Stream<DataRow> toData(final BufferedReader reader) {
         return StreamSupport.stream(new Spliterators.AbstractSpliterator<DataRow>(Long.MAX_VALUE, 0) {
             @Override
@@ -88,14 +93,19 @@ public class ComparesFiles {
         return () -> newArrayList(line.split(","));
     }
 
-    private static Input toInput(final String lhsFilename) {
-        final File file = new File(lhsFilename);
+    private static Input toInput(final String filename) {
+        final File file = new File(filename);
         final FileReader fileReader = newFileReader(file);
         final BufferedReader bufferedReader = new BufferedReader(fileReader);
         final String firstLine = readLine(bufferedReader);
         return new Input() {
             private final Schema schema = ComparesFiles.toSchema(firstLine);
             private final Stream<DataRow> data = ComparesFiles.toData(bufferedReader);
+
+            @Override
+            public String getName() {
+                return removeExtension(filename);
+            }
 
             @Override
             public Schema getSchema() {
