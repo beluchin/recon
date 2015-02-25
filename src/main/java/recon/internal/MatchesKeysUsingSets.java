@@ -1,20 +1,26 @@
 package recon.internal;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import recon.Input;
+import recon.Input.DataRow;
 import recon.internal.datamodel.KeyMatchingOutput;
+import recon.internal.datamodel.KeyMatchingOutput.Builder;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.difference;
-import static java.util.stream.Collectors.toSet;
+import static com.google.common.collect.Sets.intersection;
 
 class MatchesKeysUsingSets {
     private static class Key {
-        private final Input.DataRow row;
+        private final DataRow row;
 
-        public Key(final Input.DataRow row) {
+        public Key(final DataRow row) {
             this.row = row;
         }
 
@@ -36,28 +42,41 @@ class MatchesKeysUsingSets {
         }
     }
 
-    private final BuildsKeyMatchingOutput buildsKeyMatchingOutput;
-
-    @Inject
-    MatchesKeysUsingSets(final BuildsKeyMatchingOutput buildsKeyMatchingOutput) {
-        this.buildsKeyMatchingOutput = buildsKeyMatchingOutput;
-    }
-
     public @Nullable KeyMatchingOutput matchKeys(final Input lhs, final Input rhs) {
 
         // the inputs may not have the columns in order.
         // no need to worry about that now. The inputs only have one column
         // for the current milestone.
 
-        final Set<Key> lhsKeys = getKeys(lhs);
-        final Set<Key> rhsKeys = getKeys(rhs);
+        final Map<Key, DataRow> lhsKeysAndRows = getKeys(lhs);
+        final Map<Key, DataRow> rhsKeysAndRows = getKeys(rhs);
+        final Set<Key> rhsKeys = rhsKeysAndRows.keySet();
+        final Set<Key> lhsKeys = lhsKeysAndRows.keySet();
+        final Builder builder = new Builder();
+        final Set<Key> shared = intersection(lhsKeys, rhsKeys);
+        if (shared.size() != 0) {
+            builder.reconRows(getReconRows(
+                    lhsKeysAndRows, rhsKeysAndRows, shared));
+        }
         return existsPopulationBreaks(lhsKeys, rhsKeys)
-                ? buildsKeyMatchingOutput.build()
+                ? builder.build()
                 : null;
     }
 
-    private Set<Key> getKeys(final Input input) {
-        return input.getData().map(Key::new).collect(toSet());
+    private List<ImmutablePair<DataRow, DataRow>> getReconRows(
+            final Map<Key, DataRow> lhsKeysAndRows,
+            final Map<Key, DataRow> rhsKeysAndRows,
+            final Set<Key> shared) {
+        final List<ImmutablePair<DataRow, DataRow>> result = new ArrayList<>();
+        shared.forEach(k -> result.add(ImmutablePair.of(
+                lhsKeysAndRows.get(k), rhsKeysAndRows.get(k))));
+        return result;
+    }
+
+    private Map<Key, DataRow> getKeys(final Input input) {
+        final Map<Key, DataRow> result = new HashMap<>();
+        input.getData().forEach(r -> result.put(new Key(r), r));
+        return result;
     }
 
     private static boolean existsPopulationBreaks(

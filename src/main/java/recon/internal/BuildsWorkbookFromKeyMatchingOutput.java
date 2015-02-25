@@ -20,8 +20,12 @@ class BuildsWorkbookFromKeyMatchingOutput {
         this.buildsDataWorksheet = buildsDataWorksheet;
     }
 
-    public Workbook build(Key k, final KeyMatchingOutput d) {
-        Worksheet s = buildsDataWorksheet.build(k);
+    public Workbook build(
+            final Key k,
+            final KeyMatchingOutput d,
+            final String lhsName,
+            final String rhsName) {
+        final Worksheet s = buildsDataWorksheet.build(k, d, lhsName, rhsName);
         return buildsWorkbook.build(s);
     }
 }

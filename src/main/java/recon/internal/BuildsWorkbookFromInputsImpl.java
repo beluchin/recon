@@ -28,6 +28,8 @@ class BuildsWorkbookFromInputsImpl implements BuildsWorkbookFromInputs {
     Workbook recon(final Input lhs, final Input rhs) {
         final Key k = providesKey.get(lhs, rhs);
         final KeyMatchingOutput d = matchesKeys.matchKeys(lhs, rhs);
-        return d != null? buildsWorkbook.build(k, d) : null;
+        return d != null
+                ? buildsWorkbook.build(k, d, lhs.getName(), rhs.getName())
+                : null;
     }
 }
