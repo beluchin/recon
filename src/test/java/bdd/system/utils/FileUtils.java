@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Throwables.propagate;
-import static java.util.Arrays.stream;
 
 public final class FileUtils {
 
@@ -26,22 +25,12 @@ public final class FileUtils {
         // no-op
     }
 
-    public static File createTempFile() {
-        try {
-            return File.createTempFile("input_", ".tmp", TempDir);
-        } catch (final IOException e) {
-            throw propagate(e);
-        }
+    public static File createFileInTempDir(final String filename) {
+        return new File(TempDir + "/" + filename);
     }
 
-    @SuppressWarnings("UnusedDeclaration")
-    public static void deleteTempFilesWithPrefix(final String prefix) {
-        final File[] files = TempDir.listFiles((dir, name) -> name.matches(prefix + ".*"));
-        stream(files).forEach(File::delete);
-    }
-
-    public static String toTempFile(final Input in) {
-        final File file = createTempFile();
+    public static String toFile(final Input in) {
+        final File file = createFileInTempDir(in.getName() + ".tmp");
         addTo(file, in.getSchema(), in.getData());
         return file.getAbsolutePath();
     }

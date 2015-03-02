@@ -70,9 +70,10 @@ public class ComparesFiles {
         }
     }
 
-    private static String removeExtension(final String filename) {
-        final int i = filename.lastIndexOf('.');
-        return i != -1? filename.substring(0, i): filename;
+    private static String removePathAndExtension(final String filename) {
+        String simpleFilename = new File(filename).getName();
+        final int i = simpleFilename.lastIndexOf('.');
+        return i != -1? simpleFilename.substring(0, i): simpleFilename;
     }
 
     private static Stream<DataRow> toData(final BufferedReader reader) {
@@ -104,7 +105,7 @@ public class ComparesFiles {
 
             @Override
             public String getName() {
-                return removeExtension(filename);
+                return removePathAndExtension(filename);
             }
 
             @Override

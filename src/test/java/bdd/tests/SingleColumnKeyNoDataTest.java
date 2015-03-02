@@ -95,6 +95,7 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
         final BddWorkbook workbook = (BddWorkbook) buildsWorkbookFromInputs.recon(
                 lhs, rhs);
         final BddWorksheet worksheet = workbook.getSheet("data");
+
         assertThat(worksheet.getRow(1), is(ImmutableList.of(
                 "Hello", "LHS", "common")));
         assertThat(worksheet.getRow(2), is(ImmutableList.of(

@@ -34,8 +34,8 @@ class BuildsWorkbookFromInputsUsingFiles implements BuildsWorkbookFromInputs {
     @Override
     public @Nullable
     Workbook recon(final Input lhs, final Input rhs) {
-        final String lhsFilename = toTempFile(lhs);
-        final String rhsFilename = toTempFile(rhs);
+        final String lhsFilename = toFile(lhs);
+        final String rhsFilename = toFile(rhs);
         app.main(new String[]{lhsFilename, rhsFilename});
         return getWorkbookFromOutputFile();
     }
@@ -44,8 +44,8 @@ class BuildsWorkbookFromInputsUsingFiles implements BuildsWorkbookFromInputs {
         return convertsToWorkbook.convert(defaultOutputFilename);
     }
 
-    private String toTempFile(final Input input) {
-        return fileUtils.toTempFile(input);
+    private String toFile(final Input input) {
+        return fileUtils.toFile(input);
     }
 
 }
