@@ -74,9 +74,9 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
         final Input rhs = toInput(
                 schema("Column1"),
                 dataRow("World"));
-        final BddWorkbook workbook = (BddWorkbook) buildsWorkbookFromInputs.recon(
-                lhs, rhs);
-        final BddWorksheet worksheet = workbook.getSheet("data");
+
+        final BddWorksheet worksheet = getWorksheet("data", lhs, rhs);
+
         assertThat(worksheet.getRow(0), is(ImmutableList.of(
                 "Column1", "~InputName~", "~RecordType~")));
     }
@@ -92,14 +92,35 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
                 schema("Column1"),
                 dataRow("Hello"),
                 dataRow("World"));
-        final BddWorkbook workbook = (BddWorkbook) buildsWorkbookFromInputs.recon(
-                lhs, rhs);
-        final BddWorksheet worksheet = workbook.getSheet("data");
+
+        final BddWorksheet worksheet = getWorksheet("data", lhs, rhs);
 
         assertThat(worksheet.getRow(1), is(ImmutableList.of(
                 "Hello", "LHS", "common")));
         assertThat(worksheet.getRow(2), is(ImmutableList.of(
                 "Hello", "RHS", "common")));
+    }
+
+    @Test
+    public void _6_populationBreakRecordsOnDataSheet() {
+        final Input lhs = toInput(
+                "LHS",
+                schema("Column1"),
+                dataRow("Hello"));
+        final Input rhs = toInput(
+                "RHS",
+                schema("Column1")); // no data
+
+        final BddWorksheet worksheet = getWorksheet("data", lhs, rhs);
+
+        assertThat(worksheet.getRow(1), is(ImmutableList.of(
+                "Hello", "LHS", "missing")));
+    }
+
+    private BddWorksheet getWorksheet(final String name, final Input lhs, final Input rhs) {
+        final BddWorkbook workbook = (BddWorkbook) buildsWorkbookFromInputs.recon(
+                lhs, rhs);
+        return workbook.getSheet(name);
     }
 
     @Test
