@@ -2,18 +2,18 @@ package recon.internal;
 
 import recon.Workbook;
 import recon.config.Key;
-import recon.internal.datamodel.KeyMatchingOutput;
+import recon.internal.datamodel.KeyMatchingResult;
 import recon.internal.datamodel.Worksheet;
 import recon.internal.deps.BuildsWorkbook;
 
 import javax.inject.Inject;
 
-class BuildsWorkbookFromKeyMatchingOutput {
+class BuildsWorkbookFromKeyMatchingResult {
     private final BuildsWorkbook buildsWorkbook;
     private final BuildsDataWorksheet buildsDataWorksheet;
 
     @Inject
-    BuildsWorkbookFromKeyMatchingOutput(
+    BuildsWorkbookFromKeyMatchingResult(
             final BuildsWorkbook buildsWorkbook,
             final BuildsDataWorksheet buildsDataWorksheet) {
         this.buildsWorkbook = buildsWorkbook;
@@ -22,7 +22,7 @@ class BuildsWorkbookFromKeyMatchingOutput {
 
     public Workbook build(
             final Key k,
-            final KeyMatchingOutput d,
+            final KeyMatchingResult d,
             final String lhsName,
             final String rhsName) {
         final Worksheet s = buildsDataWorksheet.build(k, d, lhsName, rhsName);
