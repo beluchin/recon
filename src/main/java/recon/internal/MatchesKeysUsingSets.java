@@ -1,13 +1,13 @@
 package recon.internal;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import recon.Input;
 import recon.Input.DataRow;
-import recon.internal.datamodel.KeyMatchingOutput;
-import recon.internal.datamodel.KeyMatchingOutput.Builder;
+import recon.internal.datamodel.KeyMatchingResult;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,35 +42,65 @@ class MatchesKeysUsingSets {
         }
     }
 
-    public @Nullable KeyMatchingOutput matchKeys(final Input lhs, final Input rhs) {
+    private static class MatchKeysImpl {
+        private final Map<Key, DataRow> lhsKeysAndRows;
+        private final Map<Key, DataRow> rhsKeysAndRows;
+        private final Set<Key> lhsKeys;
+        private final Set<Key> rhsKeys;
 
-        // the inputs may not have the columns in order.
-        // no need to worry about that now. The inputs only have one column
-        // for the current milestone.
-
-        final Map<Key, DataRow> lhsKeysAndRows = getKeys(lhs);
-        final Map<Key, DataRow> rhsKeysAndRows = getKeys(rhs);
-        final Set<Key> rhsKeys = rhsKeysAndRows.keySet();
-        final Set<Key> lhsKeys = lhsKeysAndRows.keySet();
-        final Builder builder = new Builder();
-        final Set<Key> shared = intersection(lhsKeys, rhsKeys);
-        if (shared.size() != 0) {
-            builder.reconRows(getReconRows(
-                    lhsKeysAndRows, rhsKeysAndRows, shared));
+        public MatchKeysImpl(
+                final Map<Key, DataRow> lhsKeysAndRows,
+                final Map<Key, DataRow> rhsKeysAndRows) {
+            this.lhsKeysAndRows = lhsKeysAndRows;
+            this.rhsKeysAndRows = rhsKeysAndRows;
+            lhsKeys = lhsKeysAndRows.keySet();
+            rhsKeys = rhsKeysAndRows.keySet();
         }
-        return existsPopulationBreaks(lhsKeys, rhsKeys)
-                ? builder.build()
-                : null;
+
+        public List<Pair<DataRow,DataRow>> getReconRows() {
+            final Set<Key> shared = intersection(lhsKeys, rhsKeys);
+            if (shared.size() == 0) {
+                return ImmutableList.of();
+            }
+            final Builder<Pair<DataRow, DataRow>> builder = new Builder<>();
+            shared.forEach(k -> builder.add(ImmutablePair.of(
+                    lhsKeysAndRows.get(k), rhsKeysAndRows.get(k))));
+            return builder.build();
+        }
+
+        public Pair<List<DataRow>, List<DataRow>> getPopulationBreaks() {
+            return ImmutablePair.of(missingOnRhs(), missingOnLhs());
+        }
+
+        private List<DataRow> missingOnRhs() {
+            final Set<Key> missingKeys = difference(lhsKeys, rhsKeys);
+            final Builder<DataRow> builder = new Builder<>();
+            missingKeys.forEach(k -> builder.add(lhsKeysAndRows.get(k)));
+            return builder.build();
+        }
+
+        private List<DataRow> missingOnLhs() {
+            final Set<Key> missingKeys = difference(rhsKeys, lhsKeys);
+            final Builder<DataRow> builder = new Builder<>();
+            missingKeys.forEach(k -> builder.add(rhsKeysAndRows.get(k)));
+            return builder.build();
+        }
     }
 
-    private List<ImmutablePair<DataRow, DataRow>> getReconRows(
-            final Map<Key, DataRow> lhsKeysAndRows,
-            final Map<Key, DataRow> rhsKeysAndRows,
-            final Set<Key> shared) {
-        final List<ImmutablePair<DataRow, DataRow>> result = new ArrayList<>();
-        shared.forEach(k -> result.add(ImmutablePair.of(
-                lhsKeysAndRows.get(k), rhsKeysAndRows.get(k))));
-        return result;
+    public KeyMatchingResult matchKeys(final Input lhs, final Input rhs) {
+
+        // method implemented with object to make it easy to handle invocation state
+
+        final MatchKeysImpl impl = buildMatchesKeyImpl(lhs, rhs);
+        return new KeyMatchingResult(
+                impl.getReconRows(),
+                impl.getPopulationBreaks());
+    }
+
+    private MatchKeysImpl buildMatchesKeyImpl(final Input lhs, final Input rhs) {
+        final Map<Key, DataRow> lhsKeysAndRows = getKeys(lhs);
+        final Map<Key, DataRow> rhsKeysAndRows = getKeys(rhs);
+        return new MatchKeysImpl(lhsKeysAndRows, rhsKeysAndRows);
     }
 
     private Map<Key, DataRow> getKeys(final Input input) {
@@ -79,9 +109,4 @@ class MatchesKeysUsingSets {
         return result;
     }
 
-    private static boolean existsPopulationBreaks(
-            final Set<Key> lhsKeys, final Set<Key> rhsKeys) {
-        return difference(lhsKeys, rhsKeys).size() != 0
-                || difference(rhsKeys, lhsKeys).size() != 0;
-    }
 }

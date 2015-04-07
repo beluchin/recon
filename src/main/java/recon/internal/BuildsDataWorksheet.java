@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
 import recon.Input.DataRow;
 import recon.config.Key;
-import recon.internal.datamodel.KeyMatchingOutput;
+import recon.internal.datamodel.KeyMatchingResult;
 import recon.internal.datamodel.Worksheet;
 import recon.internal.deps.BuildsWorksheet;
 
@@ -24,7 +24,7 @@ class BuildsDataWorksheet {
 
     public Worksheet build(
             final Key k,
-            final KeyMatchingOutput d,
+            final KeyMatchingResult d,
             final String lhsName,
             final String rhsName) {
         final Builder<Integer, List<String>> rowsBuilder = new Builder<>();
@@ -52,7 +52,7 @@ class BuildsDataWorksheet {
     }
 
     private static Map<Integer, List<String>> getReconRows(
-            final KeyMatchingOutput d,
+            final KeyMatchingResult d,
             final String lhsName,
             final String rhsName,
             final int startingAt) {
