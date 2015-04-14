@@ -17,6 +17,7 @@ import static com.google.common.collect.Sets.difference;
 import static com.google.common.collect.Sets.intersection;
 
 class MatchesKeysUsingSets {
+
     private static class Key {
         private final DataRow row;
 
