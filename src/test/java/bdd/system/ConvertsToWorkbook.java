@@ -1,6 +1,5 @@
 package bdd.system;
 
-import bdd.datamodel.BddWorkbook;
 import bdd.system.datamodel.BddSystemWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import recon.Workbook;
@@ -16,7 +15,7 @@ import static com.google.common.base.Throwables.propagate;
 class ConvertsToWorkbook {
     public Optional<Workbook> convert(final String fileName) {
         if (!fileExists(fileName)) {
-            return null;
+            return Optional.empty();
         }
 
         final XSSFWorkbook w = getPoiWorkbook(fileName);

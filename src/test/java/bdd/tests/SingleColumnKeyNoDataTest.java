@@ -122,6 +122,22 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
                 "Hello", "LHS", "missing")));
     }
 
+    @Test
+    public void rhsPopulationBreakRecordsOnDataSheet() {
+        final Input lhs = toInput(
+                "LHS",
+                schema("Column1"));
+        final Input rhs = toInput(
+                "RHS",
+                schema("Column1"),
+                dataRow("Hello"));
+
+        final BddWorksheet worksheet = getWorksheet("data", lhs, rhs);
+
+        assertThat(worksheet.getRow(1), is(ImmutableList.of(
+                "Hello", "RHS", "missing")));
+    }
+
     private BddWorksheet getWorksheet(final String name, final Input lhs, final Input rhs) {
         final BddWorkbook workbook = (BddWorkbook) buildsWorkbookFromInputs.recon(
                 lhs, rhs).get();
