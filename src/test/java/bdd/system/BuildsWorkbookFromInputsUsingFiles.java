@@ -9,6 +9,7 @@ import recon.adapter.app.App;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Optional;
 
 @SuppressWarnings("AccessStaticViaInstance")
 class BuildsWorkbookFromInputsUsingFiles implements BuildsWorkbookFromInputs {
@@ -32,15 +33,14 @@ class BuildsWorkbookFromInputsUsingFiles implements BuildsWorkbookFromInputs {
 
 
     @Override
-    public @Nullable
-    Workbook recon(final Input lhs, final Input rhs) {
+    public Optional<Workbook> recon(final Input lhs, final Input rhs) {
         final String lhsFilename = toFile(lhs);
         final String rhsFilename = toFile(rhs);
         app.main(new String[]{lhsFilename, rhsFilename});
         return getWorkbookFromOutputFile();
     }
 
-    private Workbook getWorkbookFromOutputFile() {
+    private Optional<Workbook> getWorkbookFromOutputFile() {
         return convertsToWorkbook.convert(defaultOutputFilename);
     }
 

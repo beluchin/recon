@@ -6,8 +6,8 @@ import recon.Workbook;
 import recon.config.Key;
 import recon.internal.datamodel.KeyMatchingResult;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.Optional;
 
 class BuildsWorkbookFromInputsImpl implements BuildsWorkbookFromInputs {
     private final BuildsWorkbookFromKeyMatchingResult buildsWorkbook;
@@ -24,13 +24,12 @@ class BuildsWorkbookFromInputsImpl implements BuildsWorkbookFromInputs {
         this.providesKey = providesKey;
     }
 
-    public @Nullable
-    Workbook recon(final Input lhs, final Input rhs) {
+    public Optional<Workbook> recon(final Input lhs, final Input rhs) {
         final Key k = providesKey.get(lhs, rhs);
         final KeyMatchingResult d = matchesKeys.matchKeys(lhs, rhs);
         return existsIssues(d) || existsDataColumns(lhs, rhs)
-                ? buildsWorkbook.build(k, d, lhs.getName(), rhs.getName())
-                : null;
+                ? Optional.of(buildsWorkbook.build(k, d, lhs.getName(), rhs.getName()))
+                : Optional.empty();
     }
 
     @SuppressWarnings("UnusedParameters")

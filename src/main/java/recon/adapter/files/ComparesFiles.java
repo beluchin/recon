@@ -6,6 +6,7 @@ import recon.BuildsWorkbookFromInputs;
 import recon.Input;
 import recon.Input.DataRow;
 import recon.Input.Schema;
+import recon.Workbook;
 import recon.adapter.datamodel.PoiWorkbook;
 
 import javax.inject.Inject;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -39,17 +41,19 @@ public class ComparesFiles {
     public void apply(final String lhsFilename, final String rhsFilename) {
         final Input lhsInput = toInput(lhsFilename);
         final Input rhsInput = toInput(rhsFilename);
-        removeEmptyDefaultOutputFile();
-        final PoiWorkbook workbook = (PoiWorkbook) buildsWorkbookFromInputs.recon(
+        removeAnyExistingDefaultOutputFile();
+        final Optional<Workbook> w = buildsWorkbookFromInputs.recon(
                 lhsInput, rhsInput);
-        if (workbook != null) {
-            workbook.save(defaultOutputFilename);
+        if (!w.isPresent()) {
+            return;
         }
+        final PoiWorkbook workbook = (PoiWorkbook) w.get();
+        workbook.save(defaultOutputFilename);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressFBWarnings({"RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"})
-    private void removeEmptyDefaultOutputFile() {
+    private void removeAnyExistingDefaultOutputFile() {
         new File(defaultOutputFilename).delete();
     }
 

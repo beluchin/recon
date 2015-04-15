@@ -1,8 +1,7 @@
 package recon;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 public interface BuildsWorkbookFromInputs {
-    @Nullable
-    Workbook recon(Input lhs, Input rhs);
+    Optional<Workbook> recon(Input lhs, Input rhs);
 }

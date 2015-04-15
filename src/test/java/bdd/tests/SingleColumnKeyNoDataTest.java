@@ -11,6 +11,7 @@ import recon.BuildsWorkbookFromInputs;
 import recon.Input;
 import recon.Workbook;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static bdd.datamodel.InputUtils.data;
@@ -26,6 +27,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class SingleColumnKeyNoDataTest extends AbstractBddTest {
 
@@ -36,8 +39,8 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
         final Input input = toInput(
                 schema("Column1"),
                 dataRow("Hello"));
-        final Workbook result = buildsWorkbookFromInputs.recon(input, input);
-        assertThat(result, is(nullValue()));
+        final Optional<Workbook> result = buildsWorkbookFromInputs.recon(input, input);
+        assertFalse(result.isPresent());
     }
 
     @Test
@@ -48,8 +51,8 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
         final Input rhs = toInput(
                 schema("Column1"),
                 dataRow("World"));
-        final Workbook result = buildsWorkbookFromInputs.recon(lhs, rhs);
-        assertThat(result, is(not(nullValue())));
+        final Optional<Workbook> result = buildsWorkbookFromInputs.recon(lhs, rhs);
+        assertTrue(result.isPresent());
     }
 
     @Test
@@ -60,7 +63,9 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
         final Input rhs = toInput(
                 schema("Column1"),
                 dataRow("World"));
-        final BddWorkbook result = (BddWorkbook) buildsWorkbookFromInputs.recon(lhs, rhs);
+
+        final BddWorkbook result = (BddWorkbook) buildsWorkbookFromInputs.recon(lhs, rhs).get();
+
         //noinspection ConstantConditions
         assertThat(result.getSheet("data"), is(not(nullValue())));
     }
@@ -119,7 +124,7 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
 
     private BddWorksheet getWorksheet(final String name, final Input lhs, final Input rhs) {
         final BddWorkbook workbook = (BddWorkbook) buildsWorkbookFromInputs.recon(
-                lhs, rhs);
+                lhs, rhs).get();
         return workbook.getSheet(name);
     }
 
@@ -133,10 +138,10 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
                 data(uniqueStrings));
 
         final Stopwatch stopwatch = createStarted();
-        final Workbook result = buildsWorkbookFromInputs.recon(input, input);
+        final Optional<Workbook> result = buildsWorkbookFromInputs.recon(input, input);
         stopwatch.stop();
         assertThat(stopwatch.elapsed(SECONDS), is(lessThan(10L)));
-        assertThat(result, is(nullValue()));
+        assertFalse(result.isPresent());
     }
 
     @Before
