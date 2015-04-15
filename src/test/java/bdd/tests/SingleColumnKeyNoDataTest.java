@@ -123,6 +123,23 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
     }
 
     @Test
+    public void _7_duplicateRecordsOnDataSheet() {
+        final Input lhs = toInput(
+                "LHS",
+                schema("Column1"),
+                dataRow("Hello"),
+                dataRow("Hello"));
+        final Input rhs = toInput(
+                "RHS",
+                schema("Column1")); // no data
+
+        final BddWorksheet worksheet = getWorksheet("data", lhs, rhs);
+
+        assertThat(worksheet.getRow(1), is(ImmutableList.of(
+                "Hello", "LHS", "duplicate")));
+    }
+
+    @Test
     public void rhsPopulationBreakRecordsOnDataSheet() {
         final Input lhs = toInput(
                 "LHS",
