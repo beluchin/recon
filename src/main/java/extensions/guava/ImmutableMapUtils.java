@@ -1,6 +1,6 @@
 package extensions.guava;
 
-import com.google.common.collect.ImmutableBiMap.Builder;
+import com.google.common.collect.ImmutableMap.Builder;
 
 import java.util.Map;
 import java.util.stream.Stream;

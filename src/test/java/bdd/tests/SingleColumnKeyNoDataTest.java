@@ -5,12 +5,16 @@ import bdd.datamodel.BddWorkbook;
 import bdd.datamodel.BddWorksheet;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import extensions.guava.ImmutableMapUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Before;
 import org.junit.Test;
 import recon.BuildsWorkbookFromInputs;
 import recon.Input;
 import recon.Workbook;
 
+import java.util.AbstractMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -137,6 +141,8 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
 
         assertThat(worksheet.getRow(1), is(ImmutableList.of(
                 "Hello", "LHS", "duplicate")));
+        assertThat(worksheet.getRow(2), is(ImmutableList.of(
+                "Hello", "LHS", "duplicate")));
     }
 
     @Test
@@ -153,6 +159,21 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
 
         assertThat(worksheet.getRow(1), is(ImmutableList.of(
                 "Hello", "RHS", "missing")));
+    }
+
+    @Test
+    public void immutableMapFromBuilderWithDuplicateValues() {
+        ImmutableMap.Builder<Integer, String> builder = new ImmutableMap.Builder<>();
+        builder.put(ImmutablePair.of(1, "a"));
+        builder.put(ImmutablePair.of(2, "a"));
+        builder.build();
+    }
+
+    @Test
+    public void immutableMapInlineWithDuplicateValues() {
+        ImmutableMap.of(
+                1, "a",
+                2, "a");
     }
 
     private BddWorksheet getWorksheet(final String name, final Input lhs, final Input rhs) {

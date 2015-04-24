@@ -8,13 +8,17 @@ import recon.Input;
 import recon.Input.DataRow;
 import recon.internal.datamodel.KeyMatchingResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.Sets.difference;
 import static com.google.common.collect.Sets.intersection;
+import static java.util.stream.Collectors.toList;
 
 class MatchesKeysUsingSets {
 
@@ -43,71 +47,120 @@ class MatchesKeysUsingSets {
         }
     }
 
-    private static class MatchKeysImpl {
-        private final Map<Key, DataRow> lhsKeysAndRows;
-        private final Map<Key, DataRow> rhsKeysAndRows;
-        private final Set<Key> lhsKeys;
-        private final Set<Key> rhsKeys;
-
-        public MatchKeysImpl(
-                final Map<Key, DataRow> lhsKeysAndRows,
-                final Map<Key, DataRow> rhsKeysAndRows) {
-            this.lhsKeysAndRows = lhsKeysAndRows;
-            this.rhsKeysAndRows = rhsKeysAndRows;
-            lhsKeys = lhsKeysAndRows.keySet();
-            rhsKeys = rhsKeysAndRows.keySet();
-        }
-
-        public List<Pair<DataRow,DataRow>> getReconRows() {
-            final Set<Key> shared = intersection(lhsKeys, rhsKeys);
-            if (shared.size() == 0) {
-                return ImmutableList.of();
-            }
-            final Builder<Pair<DataRow, DataRow>> builder = new Builder<>();
-            shared.forEach(k -> builder.add(ImmutablePair.of(
-                    lhsKeysAndRows.get(k), rhsKeysAndRows.get(k))));
-            return builder.build();
-        }
-
-        public Pair<List<DataRow>, List<DataRow>> getPopulationBreaks() {
-            return ImmutablePair.of(missingOnRhs(), missingOnLhs());
-        }
-
-        private List<DataRow> missingOnRhs() {
-            final Set<Key> missingKeys = difference(lhsKeys, rhsKeys);
-            final Builder<DataRow> builder = new Builder<>();
-            missingKeys.forEach(k -> builder.add(lhsKeysAndRows.get(k)));
-            return builder.build();
-        }
-
-        private List<DataRow> missingOnLhs() {
-            final Set<Key> missingKeys = difference(rhsKeys, lhsKeys);
-            final Builder<DataRow> builder = new Builder<>();
-            missingKeys.forEach(k -> builder.add(rhsKeysAndRows.get(k)));
-            return builder.build();
-        }
-    }
-
     public KeyMatchingResult matchKeys(final Input lhs, final Input rhs) {
 
-        // method implemented with object to make it easy to handle invocation state
+        class Helper {
+            private final List<Map.Entry<Key, DataRow>> lhsAllKeysAndRows =
+                    getAllKeysAndRows(lhs);
+            private final List<Map.Entry<Key, DataRow>> rhsAllKeysAndRows =
+                    getAllKeysAndRows(rhs);
+            private final Map<Key, DataRow> lhsDistinctKeysAndRows =
+                    getDistinctRows(lhsAllKeysAndRows.stream());
+            private final Map<Key, DataRow> rhsDistinctKeysAndRows =
+                    getDistinctRows(rhsAllKeysAndRows.stream());
+            private final Set<Key> lhsDistinctKeys = lhsDistinctKeysAndRows.keySet();
+            private final Set<Key> rhsDistinctKeys = rhsDistinctKeysAndRows.keySet();
 
-        final MatchKeysImpl impl = buildMatchesKeyImpl(lhs, rhs);
+            public List<Pair<DataRow,DataRow>> getReconRows() {
+                final Set<Key> shared = intersection(lhsDistinctKeys, rhsDistinctKeys);
+                if (shared.size() == 0) {
+                    return ImmutableList.of();
+                }
+                final Builder<Pair<DataRow, DataRow>> builder = new Builder<>();
+                shared.forEach(k -> builder.add(ImmutablePair.of(
+                        lhsDistinctKeysAndRows.get(k), rhsDistinctKeysAndRows.get(k))));
+                return builder.build();
+            }
+
+            public Pair<List<DataRow>, List<DataRow>> getPopulationBreaks() {
+                return ImmutablePair.of(missingOnRhs(), missingOnLhs());
+            }
+
+            public Pair<List<DataRow>, List<DataRow>> getDuplicates() {
+                return ImmutablePair.of(duplicatesOnLhs(), duplicatesOnRhs());
+            }
+
+            private List<Map.Entry<Key, DataRow>> getAllKeysAndRows(final Input input) {
+                return input.getData()
+                        .map(r -> ImmutablePair.of(new Key(r), r))
+                        .collect(toList());
+            }
+
+            private List<DataRow> duplicatesOnRhs() {
+                return getDuplicateRows(rhsAllKeysAndRows.stream());
+            }
+
+            private List<DataRow> duplicatesOnLhs() {
+                return getDuplicateRows(lhsAllKeysAndRows.stream());
+            }
+
+            private List<DataRow> missingOnRhs() {
+                final Set<Key> missingKeys = difference(lhsDistinctKeys, rhsDistinctKeys);
+                final Builder<DataRow> builder = new Builder<>();
+                missingKeys.forEach(k -> builder.add(lhsDistinctKeysAndRows.get(k)));
+                return builder.build();
+            }
+
+            private List<DataRow> missingOnLhs() {
+                final Set<Key> missingKeys = difference(rhsDistinctKeys, lhsDistinctKeys);
+                final Builder<DataRow> builder = new Builder<>();
+                missingKeys.forEach(k -> builder.add(rhsDistinctKeysAndRows.get(k)));
+                return builder.build();
+            }
+        }
+
+        final Helper h = new Helper();
         return new KeyMatchingResult(
-                impl.getReconRows(),
-                impl.getPopulationBreaks());
+                h.getReconRows(),
+                h.getPopulationBreaks(),
+                h.getDuplicates());
     }
 
-    private MatchKeysImpl buildMatchesKeyImpl(final Input lhs, final Input rhs) {
-        final Map<Key, DataRow> lhsKeysAndRows = getKeys(lhs);
-        final Map<Key, DataRow> rhsKeysAndRows = getKeys(rhs);
-        return new MatchKeysImpl(lhsKeysAndRows, rhsKeysAndRows);
-    }
-
-    private Map<Key, DataRow> getKeys(final Input input) {
+    private Map<Key, DataRow> getDistinctRows(
+            final Stream<Map.Entry<Key, DataRow>> keysAndRows) {
         final Map<Key, DataRow> result = new HashMap<>();
-        input.getData().forEach(r -> result.put(new Key(r), r));
+        keysAndRows.reduce(
+                result,
+                (m, entry) -> {
+                    if (m.containsKey(entry.getKey())) {
+                        m.remove(entry.getKey());
+                    }
+                    else {
+                        put(m, entry);
+                    }
+                    return m;
+                },
+                (m1, m2) -> result);
+
         return result;
+    }
+
+    private List<DataRow> getDuplicateRows(
+            final Stream<Map.Entry<Key, DataRow>> keysAndRows) {
+        final List<DataRow> result = new ArrayList<>();
+        final Set<Key> duplicates = new HashSet<>();
+        final Map<Key, DataRow> firstEntries = new HashMap<>();
+
+        keysAndRows.forEach(e -> {
+            final Key k = e.getKey();
+            final DataRow r = e.getValue();
+            if (firstEntries.containsKey(k)) {
+                duplicates.add(k);
+                result.add(r);
+            }
+            else {
+                firstEntries.put(k, r);
+            }
+        });
+
+        duplicates.stream().forEach(k -> result.add(firstEntries.get(k)));
+
+        return result;
+    }
+
+    private static void put(
+            final Map<Key, DataRow> map, final Map.Entry<Key, DataRow> entry) {
+        map.put(entry.getKey(), entry.getValue());
     }
 
 }

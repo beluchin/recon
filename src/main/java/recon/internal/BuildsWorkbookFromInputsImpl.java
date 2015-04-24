@@ -37,12 +37,18 @@ class BuildsWorkbookFromInputsImpl implements BuildsWorkbookFromInputs {
         return false;
     }
 
-    private boolean existsIssues(final KeyMatchingResult d) {
-        return existsPopulationBreaks(d);
+    private boolean existsIssues(final KeyMatchingResult r) {
+        return existsPopulationBreaks(r)
+                || existDuplicates(r);
     }
 
-    private boolean existsPopulationBreaks(final KeyMatchingResult d) {
-        return !d.populationBreaks.getLeft().isEmpty()
-                || !d.populationBreaks.getRight().isEmpty();
+    private boolean existDuplicates(final KeyMatchingResult r) {
+        return !r.duplicates.getLeft().isEmpty()
+                || !r.duplicates.getRight().isEmpty();
+    }
+
+    private boolean existsPopulationBreaks(final KeyMatchingResult r) {
+        return !r.populationBreaks.getLeft().isEmpty()
+                || !r.populationBreaks.getRight().isEmpty();
     }
 }

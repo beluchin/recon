@@ -14,10 +14,11 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 class BuildsDataWorksheet {
-    private BuildsWorksheet buildsWorksheet;
+    private final BuildsWorksheet buildsWorksheet;
 
     @Inject
     BuildsDataWorksheet(final BuildsWorksheet buildsWorksheet) {
@@ -58,14 +59,48 @@ class BuildsDataWorksheet {
                         .build());
             }
 
-            private Stream<ImmutablePair<Integer, List<String>>> getRhsPopulationBreakRows() {
-                return result.populationBreaks.getRight().stream()
-                        .map(r -> ImmutablePair.of(rowNumber++, buildPopulationBreakRow(r, rhsName)));
+            public Map<Integer, List<String>> duplicates() {
+                return ImmutableMapUtils.copyOf(Stream.concat(
+                        getLhsDuplicateRows(),
+                        getRhsDuplicateRows()));
             }
 
-            private Stream<ImmutablePair<Integer, List<String>>> getLhsPopulationBreakRows() {
-                return result.populationBreaks.getLeft().stream()
-                        .map(r -> ImmutablePair.of(rowNumber++, buildPopulationBreakRow(r, lhsName)));
+            private Stream<Entry<Integer, List<String>>> getRhsDuplicateRows() {
+                return getWorksheetRows(
+                        result.duplicates.getRight().stream(),
+                        rhsName,
+                        BuildsDataWorksheet::buildDuplicateRow);
+            }
+
+            private Stream<Entry<Integer, List<String>>> getWorksheetRows(
+                    final Stream<DataRow> dataRows,
+                    final String inputName,
+                    final BiFunction<DataRow, String, List<String>> worksheetRowBuilder) {
+                return dataRows.map(
+                        r -> ImmutablePair.of(
+                                rowNumber++,
+                                worksheetRowBuilder.apply(r, inputName)));
+            }
+
+            private Stream<Entry<Integer, List<String>>> getLhsDuplicateRows() {
+                return getWorksheetRows(
+                        result.duplicates.getLeft().stream(),
+                        lhsName,
+                        BuildsDataWorksheet::buildDuplicateRow);
+            }
+
+            private Stream<Entry<Integer, List<String>>> getRhsPopulationBreakRows() {
+                return getWorksheetRows(
+                        result.populationBreaks.getRight().stream(),
+                        rhsName,
+                        BuildsDataWorksheet::buildPopulationBreakRow);
+            }
+
+            private Stream<Entry<Integer, List<String>>> getLhsPopulationBreakRows() {
+                return getWorksheetRows(
+                        result.populationBreaks.getLeft().stream(),
+                        lhsName,
+                        BuildsDataWorksheet::buildPopulationBreakRow);
             }
         }
 
@@ -76,7 +111,12 @@ class BuildsDataWorksheet {
                         .put(h.columnNameRow())
                         .putAll(h.reconRows())
                         .putAll(h.populationBreaks())
+                        .putAll(h.duplicates())
                         .build());
+    }
+
+    private static List<String> buildDuplicateRow(final DataRow r, final String inputName) {
+        return buildRow(r, inputName, "duplicate");
     }
 
     private static List<String> buildPopulationBreakRow(final DataRow r, final String inputName) {

@@ -22,10 +22,10 @@ class BuildsWorkbookFromKeyMatchingResult {
 
     public Workbook build(
             final Key k,
-            final KeyMatchingResult d,
+            final KeyMatchingResult r,
             final String lhsName,
             final String rhsName) {
-        final Worksheet s = buildsDataWorksheet.build(k, d, lhsName, rhsName);
+        final Worksheet s = buildsDataWorksheet.build(k, r, lhsName, rhsName);
         return buildsWorkbook.build(s);
     }
 }
