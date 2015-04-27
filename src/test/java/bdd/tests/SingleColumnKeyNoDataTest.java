@@ -5,16 +5,14 @@ import bdd.datamodel.BddWorkbook;
 import bdd.datamodel.BddWorksheet;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import extensions.guava.ImmutableMapUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import recon.BuildsWorkbookFromInputs;
 import recon.Input;
 import recon.Workbook;
 
-import java.util.AbstractMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -23,8 +21,11 @@ import static bdd.datamodel.InputUtils.dataRow;
 import static bdd.datamodel.InputUtils.schema;
 import static bdd.datamodel.InputUtils.toInput;
 import static com.google.common.base.Stopwatch.createStarted;
+import static java.util.Collections.shuffle;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.generate;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -37,6 +38,8 @@ import static org.junit.Assert.assertTrue;
 public class SingleColumnKeyNoDataTest extends AbstractBddTest {
 
     private BuildsWorkbookFromInputs buildsWorkbookFromInputs;
+    private static final long _50K = 50000;
+    private static final long _25K = 25000;
 
     @Test
     public void _1_noOutputIfInputsAreIdentical() {
@@ -162,31 +165,8 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
     }
 
     @Test
-    public void immutableMapFromBuilderWithDuplicateValues() {
-        ImmutableMap.Builder<Integer, String> builder = new ImmutableMap.Builder<>();
-        builder.put(ImmutablePair.of(1, "a"));
-        builder.put(ImmutablePair.of(2, "a"));
-        builder.build();
-    }
-
-    @Test
-    public void immutableMapInlineWithDuplicateValues() {
-        ImmutableMap.of(
-                1, "a",
-                2, "a");
-    }
-
-    private BddWorksheet getWorksheet(final String name, final Input lhs, final Input rhs) {
-        final BddWorkbook workbook = (BddWorkbook) buildsWorkbookFromInputs.recon(
-                lhs, rhs).get();
-        return workbook.getSheet(name);
-    }
-
-    @Test
-    public void performanceOnlyKeysNoBreaks() {
-        final long _50K = 50000;
-        final Stream<String> uniqueStrings = generate(SingleColumnKeyNoDataTest::randomString)
-                .limit(_50K);
+    public void performanceNoBreaks() {
+        final Stream<String> uniqueStrings = randomStrings(_50K);
         final Input input = toInput(
                 schema("Column1"),
                 data(uniqueStrings));
@@ -198,13 +178,46 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
         assertFalse(result.isPresent());
     }
 
+    @Ignore
+    @Test
+    public void performanceWithBreaks() {
+        List<String> lhsData = randomStrings(_50K).collect(toList());
+        final List<String> rhsData = concat(
+                lhsData.stream().limit(_25K),
+                randomStrings(_25K))
+                .collect(toList());
+        shuffle(rhsData);
+        final Input lhs = toInput(
+                schema("Column1"),
+                data(lhsData.stream()));
+        final Input rhs = toInput(
+                schema("Column1"),
+                data(rhsData.stream()));
+
+        final Stopwatch stopwatch = createStarted();
+        buildsWorkbookFromInputs.recon(lhs, rhs);
+        stopwatch.stop();
+        assertThat(stopwatch.elapsed(SECONDS), is(lessThan(30L)));
+    }
+
     @Before
     public void setUp() {
         buildsWorkbookFromInputs = getInstance(BuildsWorkbookFromInputs.class);
     }
 
+    private BddWorksheet getWorksheet(final String name, final Input lhs, final Input rhs) {
+        final BddWorkbook workbook = (BddWorkbook) buildsWorkbookFromInputs.recon(
+                lhs, rhs).get();
+        return workbook.getSheet(name);
+    }
+
     private static String randomString() {
         return randomUUID().toString();
+    }
+
+    private static Stream<String> randomStrings(final long size) {
+        return generate(SingleColumnKeyNoDataTest::randomString)
+                .limit(size);
     }
 
 }
