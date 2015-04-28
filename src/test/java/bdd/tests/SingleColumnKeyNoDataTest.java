@@ -73,7 +73,6 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
 
         final BddWorkbook result = (BddWorkbook) buildsWorkbookFromInputs.recon(lhs, rhs).get();
 
-        //noinspection ConstantConditions
         assertThat(result.getSheet("data"), is(not(nullValue())));
     }
 
@@ -149,6 +148,20 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
     }
 
     @Test
+    public void _8_reconSheet() {
+        final Input lhs = toInput(
+                schema("Column1"),
+                dataRow("Hello"));
+        final Input rhs = toInput(
+                schema("Column1"),
+                dataRow("World"));
+
+        final BddWorkbook result = (BddWorkbook) buildsWorkbookFromInputs.recon(lhs, rhs).get();
+
+        assertThat(result.getSheet("recon"), is(not(nullValue())));
+    }
+
+    @Test
     public void rhsPopulationBreakRecordsOnDataSheet() {
         final Input lhs = toInput(
                 "LHS",
@@ -181,7 +194,7 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
     @Ignore
     @Test
     public void performanceWithBreaks() {
-        List<String> lhsData = randomStrings(_50K).collect(toList());
+        final List<String> lhsData = randomStrings(_50K).collect(toList());
         final List<String> rhsData = concat(
                 lhsData.stream().limit(_25K),
                 randomStrings(_25K))
