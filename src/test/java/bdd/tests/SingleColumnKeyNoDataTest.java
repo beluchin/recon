@@ -162,6 +162,20 @@ public class SingleColumnKeyNoDataTest extends AbstractBddTest {
     }
 
     @Test
+    public void _9_reconSheetColumns() {
+        final Input lhs = toInput(
+                schema("Column1"),
+                dataRow("Hello"));
+        final Input rhs = toInput(
+                schema("Column1"),
+                dataRow("World"));
+
+        final BddWorksheet worksheet = getWorksheet("recon", lhs, rhs);
+
+        assertThat(worksheet.getRow(0), is(ImmutableList.of("Column1")));
+    }
+
+    @Test
     public void rhsPopulationBreakRecordsOnDataSheet() {
         final Input lhs = toInput(
                 "LHS",

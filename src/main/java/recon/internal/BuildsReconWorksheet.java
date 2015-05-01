@@ -17,7 +17,8 @@ class BuildsReconWorksheet {
     }
 
     public Worksheet build(final Key key, final KeyMatchingResult result) {
-        return buildsWorksheet.build("recon", ImmutableMap.of());
+        return buildsWorksheet.build("recon", ImmutableMap.of(
+                0, key.asList()));
     }
 
 }
