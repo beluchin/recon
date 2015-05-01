@@ -11,13 +11,16 @@ import javax.inject.Inject;
 class BuildsWorkbookFromKeyMatchingResult {
     private final BuildsWorkbook buildsWorkbook;
     private final BuildsDataWorksheet buildsDataWorksheet;
+    private BuildsReconWorksheet buildsReconWorksheet;
 
     @Inject
     BuildsWorkbookFromKeyMatchingResult(
             final BuildsWorkbook buildsWorkbook,
-            final BuildsDataWorksheet buildsDataWorksheet) {
+            final BuildsDataWorksheet buildsDataWorksheet,
+            final BuildsReconWorksheet buildsReconWorksheet) {
         this.buildsWorkbook = buildsWorkbook;
         this.buildsDataWorksheet = buildsDataWorksheet;
+        this.buildsReconWorksheet = buildsReconWorksheet;
     }
 
     public Workbook build(
@@ -25,7 +28,8 @@ class BuildsWorkbookFromKeyMatchingResult {
             final KeyMatchingResult r,
             final String lhsName,
             final String rhsName) {
-        final Worksheet s = buildsDataWorksheet.build(k, r, lhsName, rhsName);
-        return buildsWorkbook.build(s);
+        final Worksheet data = buildsDataWorksheet.build(k, r, lhsName, rhsName);
+        final Worksheet recon = buildsReconWorksheet.build(k, r);
+        return buildsWorkbook.build(recon, data);
     }
 }
